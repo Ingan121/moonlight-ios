@@ -337,11 +337,11 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     // Notify of user interaction and start expiration timer
     [self startInteractionTimer];
 
-    for (int i = 0; i < 5; i++) {
-        if (touchTracker[i] != nil) {
-            touchTracker[i] = event;
-        }
-    }
+    //for (int i = 0; i < 5; i++) {
+      //  if (touchTracker[i] != nil) {
+        //    touchTracker[i] = event;
+    //    }
+    //}
     
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
