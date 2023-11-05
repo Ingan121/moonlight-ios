@@ -271,12 +271,12 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
             return;
     }
 
-    int id = [self getTouchId:event];
+    // int id = [self getTouchId:event];
 
     CGPoint location = [self adjustCoordinatesForVideoArea:[event locationInView:self]];
     CGSize videoSize = [self getVideoAreaSize];
     
-    LiSendTouchEvent(type, (uint32_t)id, location.x / videoSize.width, location.y / videoSize.height,
+    LiSendTouchEvent(type, 0, location.x / videoSize.width, location.y / videoSize.height,
                    (event.force / event.maximumPossibleForce) / sin(event.altitudeAngle),
                    0.0f, 0.0f,
                    [self getRotationFromAzimuthAngle:[event azimuthAngleInView:self]]);
@@ -601,8 +601,8 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     
     hasUserInteracted = YES;
 
-    int id = [self getTouchId:event];
-    touchTracker[id] = nil;
+    //int id = [self getTouchId:event];
+    //touchTracker[id] = nil;
     
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
@@ -624,8 +624,8 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
                       forTouches:touches
                        withEvent:event];
 
-    int id = [self getTouchId:event];
-    touchTracker[id] = nil;
+    //int id = [self getTouchId:event];
+    //touchTracker[id] = nil;
     
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
