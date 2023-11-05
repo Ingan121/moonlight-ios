@@ -27,4 +27,13 @@ jobs:
           if [ $scheme = default ]; then scheme=$(cat default); fi
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild clean build analyze -scheme "$scheme" -"$filetype_parameter" "$file_to_build" | xcpretty && exit ${PIPESTATUS[0]}
+          xcodebuild clean build analyze -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -configuration "Debug" CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_REQUIRED="NO" CODE_SIGN_IDENTITY="" BUILD_DIR=${{ github.workspace }}/xcodebuild
+          mkdir -p ${{ github.workspace }}/ipadir/Payload
+          cp -R ${{ github.workspace }}/xcodebuild/Debug-iphoneos/Moonlight.app ${{ github.workspace }}/ipadir/Payload
+          cd ${{ github.workspace }}/ipadir
+          zip -r ${{ github.workspace }}/Moonlight.ipa .
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: Santander
+          path: ${{ github.workspace }}/Moonlight.ipa
