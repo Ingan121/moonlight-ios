@@ -43,6 +43,8 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     BOOL hasUserInteracted;
     
     NSDictionary<NSString *, NSNumber *> *dictCodes;
+
+    NSMutableArray *touchTracker;
 }
 
 - (void) setupStreamView:(ControllerSupport*)controllerSupport
@@ -52,6 +54,8 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     self->streamAspectRatio = (float)streamConfig.width / (float)streamConfig.height;
     
     TemporarySettings* settings = [[[DataManager alloc] init] getSettings];
+
+    touchTracker = [NSMutableArray arrayWithObjects:nil, nil, nil, nil, nil];
     
     keyInputField = [[KeyboardInputField alloc] initWithFrame:CGRectZero];
     [keyInputField setKeyboardType:UIKeyboardTypeDefault];
@@ -238,6 +242,15 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     return 90 - MIN(90, altitudeDegs);
 }
 
+- (int)getTouchId:(UITouch*)event {
+    for (int i = 0; i < 5; i++) {
+        if (touchTracker[i] == event) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 - (void)sendStylusEvent:(UITouch*)event {
     uint8_t type;
     
@@ -261,11 +274,10 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     CGPoint location = [self adjustCoordinatesForVideoArea:[event locationInView:self]];
     CGSize videoSize = [self getVideoAreaSize];
     
-    LiSendPenEvent(type, LI_TOOL_TYPE_PEN, 0, location.x / videoSize.width, location.y / videoSize.height,
+    LiSendTouchEvent(type, getTouchId(event), location.x / videoSize.width, location.y / videoSize.height,
                    (event.force / event.maximumPossibleForce) / sin(event.altitudeAngle),
                    0.0f, 0.0f,
-                   [self getRotationFromAzimuthAngle:[event azimuthAngleInView:self]],
-                   [self getTiltFromAltitudeAngle:event.altitudeAngle]);
+                   [self getRotationFromAzimuthAngle:[event azimuthAngleInView:self]]);
 }
 
 - (void)sendStylusHoverEvent:(UIHoverGestureRecognizer*)gesture API_AVAILABLE(ios(13.0)) {
@@ -322,6 +334,12 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     
     // Notify of user interaction and start expiration timer
     [self startInteractionTimer];
+
+    for (int i = 0; i < 5; i++) {
+        if (touchTracker[i] != nil) {
+            touchTracker[i] = event;
+        }
+    }
     
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
@@ -580,6 +598,9 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     Log(LOG_D, @"Touch up");
     
     hasUserInteracted = YES;
+
+    int id = getTouchId(event);
+    touchTracker[id] = nil;
     
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
@@ -600,6 +621,10 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     [self handleMouseButtonEvent:BUTTON_ACTION_RELEASE
                       forTouches:touches
                        withEvent:event];
+
+    int id = getTouchId(event);
+    touchTracker[id] = nil;
+    
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
         for (UITouch* touch in touches) {
