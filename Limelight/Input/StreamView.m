@@ -43,8 +43,6 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     BOOL hasUserInteracted;
     
     NSDictionary<NSString *, NSNumber *> *dictCodes;
-
-    NSMutableArray *touchTracker;
 }
 
 - (void) setupStreamView:(ControllerSupport*)controllerSupport
@@ -54,8 +52,6 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     self->streamAspectRatio = (float)streamConfig.width / (float)streamConfig.height;
     
     TemporarySettings* settings = [[[DataManager alloc] init] getSettings];
-
-    touchTracker = [NSMutableArray arrayWithObjects:nil, nil, nil, nil, nil];
     
     keyInputField = [[KeyboardInputField alloc] initWithFrame:CGRectZero];
     [keyInputField setKeyboardType:UIKeyboardTypeDefault];
@@ -242,15 +238,6 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     return 90 - MIN(90, altitudeDegs);
 }
 
-- (int)getTouchId:(UIEvent*)event {
-    for (int i = 0; i < 5; i++) {
-        if (touchTracker[i] == event) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 - (void)sendStylusEvent:(UITouch*)event {
     uint8_t type;
     
@@ -270,8 +257,6 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
         default:
             return;
     }
-
-    // int id = [self getTouchId:event];
 
     CGPoint location = [self adjustCoordinatesForVideoArea:[event locationInView:self]];
     CGSize videoSize = [self getVideoAreaSize];
@@ -336,12 +321,6 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     
     // Notify of user interaction and start expiration timer
     [self startInteractionTimer];
-
-    //for (int i = 0; i < 5; i++) {
-      //  if (touchTracker[i] != nil) {
-        //    touchTracker[i] = event;
-    //    }
-    //}
     
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
@@ -600,9 +579,6 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     Log(LOG_D, @"Touch up");
     
     hasUserInteracted = YES;
-
-    //int id = [self getTouchId:event];
-    //touchTracker[id] = nil;
     
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
@@ -623,9 +599,6 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     [self handleMouseButtonEvent:BUTTON_ACTION_RELEASE
                       forTouches:touches
                        withEvent:event];
-
-    //int id = [self getTouchId:event];
-    //touchTracker[id] = nil;
     
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
