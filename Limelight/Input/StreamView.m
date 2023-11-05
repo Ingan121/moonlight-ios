@@ -326,10 +326,8 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
         for (UITouch* touch in touches) {
-            if (touch.type == UITouchTypePencil) {
-                [self sendStylusEvent:touch];
-                return;
-            }
+            [self sendStylusEvent:touch];
+            return;
         }
     }
 #endif
@@ -501,10 +499,8 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
         for (UITouch* touch in touches) {
-            if (touch.type == UITouchTypePencil) {
-                [self sendStylusEvent:touch];
-                return;
-            }
+            [self sendStylusEvent:touch];
+            return;
         }
         
         UITouch *touch = [touches anyObject];
@@ -588,10 +584,8 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
         for (UITouch* touch in touches) {
-            if (touch.type == UITouchTypePencil) {
-                [self sendStylusEvent:touch];
-                return;
-            }
+            [self sendStylusEvent:touch];
+            return;
         }
     }
 #endif
@@ -609,9 +603,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
         for (UITouch* touch in touches) {
-            if (touch.type == UITouchTypePencil) {
-                [self sendStylusEvent:touch];
-            }
+            [self sendStylusEvent:touch];
         }
     }
 #endif
