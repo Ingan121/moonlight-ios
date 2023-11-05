@@ -242,7 +242,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     return 90 - MIN(90, altitudeDegs);
 }
 
-- (int)getTouchId:(UITouch*)event {
+- (int)getTouchId:(UIEvent*)event {
     for (int i = 0; i < 5; i++) {
         if (touchTracker[i] == event) {
             return i;
@@ -624,7 +624,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
                       forTouches:touches
                        withEvent:event];
 
-    int id = [self getTouchId:event]
+    int id = [self getTouchId:event];
     touchTracker[id] = nil;
     
 #if !TARGET_OS_TV
