@@ -276,7 +276,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     CGPoint location = [self adjustCoordinatesForVideoArea:[event locationInView:self]];
     CGSize videoSize = [self getVideoAreaSize];
     
-    LiSendTouchEvent(type, (uint32_t)&event, location.x / videoSize.width, location.y / videoSize.height,
+    LiSendTouchEvent(type, (uint32_t)event, location.x / videoSize.width, location.y / videoSize.height,
                    (event.force / event.maximumPossibleForce) / sin(event.altitudeAngle),
                    0.0f, 0.0f,
                    [self getRotationFromAzimuthAngle:[event azimuthAngleInView:self]]);
