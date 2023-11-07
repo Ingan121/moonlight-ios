@@ -74,7 +74,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
         self->touchHandler = [[RelativeTouchHandler alloc] initWithView:self];
     }
 
-    self->nativeTouchMode = settings.absoluteTouchMode;
+    self->nativeTouchMode = !settings.absoluteTouchMode;
     
     onScreenControls = [[OnScreenControls alloc] initWithView:self controllerSup:controllerSupport streamConfig:streamConfig];
     OnScreenControlsLevel level = (OnScreenControlsLevel)[settings.onscreenControls integerValue];
