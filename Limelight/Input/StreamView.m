@@ -238,7 +238,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     return 90 - MIN(90, altitudeDegs);
 }
 
-- (void)sendStylusEvent:(UITouch*)event {
+- (void)sendTouchEvent:(UITouch*)event {
     uint8_t type;
     
     switch (event.phase) {
@@ -265,6 +265,36 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
                    (event.force / event.maximumPossibleForce) / sin(event.altitudeAngle),
                    0.0f, 0.0f,
                    [self getRotationFromAzimuthAngle:[event azimuthAngleInView:self]]);
+}
+
+- (void)sendStylusEvent:(UITouch*)event {
+    uint8_t type;
+    
+    switch (event.phase) {
+        case UITouchPhaseBegan:
+            type = LI_TOUCH_EVENT_DOWN;
+            break;
+        case UITouchPhaseMoved:
+            type = LI_TOUCH_EVENT_MOVE;
+            break;
+        case UITouchPhaseEnded:
+            type = LI_TOUCH_EVENT_UP;
+            break;
+        case UITouchPhaseCancelled:
+            type = LI_TOUCH_EVENT_CANCEL;
+            break;
+        default:
+            return;
+    }
+
+    CGPoint location = [self adjustCoordinatesForVideoArea:[event locationInView:self]];
+    CGSize videoSize = [self getVideoAreaSize];
+    
+    LiSendPenEvent(type, LI_TOOL_TYPE_PEN, 0, location.x / videoSize.width, location.y / videoSize.height,
+                   (event.force / event.maximumPossibleForce) / sin(event.altitudeAngle),
+                   0.0f, 0.0f,
+                   [self getRotationFromAzimuthAngle:[event azimuthAngleInView:self]],
+                   [self getTiltFromAltitudeAngle:event.altitudeAngle]);
 }
 
 - (void)sendStylusHoverEvent:(UIHoverGestureRecognizer*)gesture API_AVAILABLE(ios(13.0)) {
@@ -325,8 +355,13 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
         for (UITouch* touch in touches) {
-            [self sendStylusEvent:touch];
-            return;
+            if (touch.type == UITouchTypePencil) {
+                [self sendStylusEvent:touch];
+                return;
+            } else if (settings.absoluteTouchMode) { // temp
+                [self sendTouchEvent:touch];
+                return;
+            }
         }
     }
 #endif
@@ -498,8 +533,13 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
         for (UITouch* touch in touches) {
-            [self sendStylusEvent:touch];
-            return;
+            if (touch.type == UITouchTypePencil) {
+                [self sendStylusEvent:touch];
+                return;
+            } else if (settings.absoluteTouchMode) { // temp
+                [self sendTouchEvent:touch];
+                return;
+            }
         }
         
         UITouch *touch = [touches anyObject];
@@ -583,8 +623,13 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
         for (UITouch* touch in touches) {
-            [self sendStylusEvent:touch];
-            return;
+            if (touch.type == UITouchTypePencil) {
+                [self sendStylusEvent:touch];
+                return;
+            } else if (settings.absoluteTouchMode) { // temp
+                [self sendTouchEvent:touch];
+                return;
+            }
         }
     }
 #endif
@@ -595,7 +640,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-    [touchHandler touchesCancelled:touches withEvent:event];
+    //[touchHandler touchesCancelled:touches withEvent:event];
     [self handleMouseButtonEvent:BUTTON_ACTION_RELEASE
                       forTouches:touches
                        withEvent:event];
@@ -603,7 +648,11 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
 #if !TARGET_OS_TV
     if (@available(iOS 13.4, *)) {
         for (UITouch* touch in touches) {
-            [self sendStylusEvent:touch];
+            if (touch.type == UITouchTypePencil) {
+                [self sendStylusEvent:touch];
+            } else if (settings.absoluteTouchMode) { // temp
+                [self sendTouchEvent:touch];
+            }
         }
     }
 #endif
