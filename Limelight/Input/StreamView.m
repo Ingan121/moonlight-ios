@@ -43,6 +43,8 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     BOOL hasUserInteracted;
     
     NSDictionary<NSString *, NSNumber *> *dictCodes;
+
+    BOOL nativeTouchMode;
 }
 
 - (void) setupStreamView:(ControllerSupport*)controllerSupport
@@ -71,6 +73,8 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     else {
         self->touchHandler = [[RelativeTouchHandler alloc] initWithView:self];
     }
+
+    self->nativeTouchMode = settings.absoluteTouchMode;
     
     onScreenControls = [[OnScreenControls alloc] initWithView:self controllerSup:controllerSupport streamConfig:streamConfig];
     OnScreenControlsLevel level = (OnScreenControlsLevel)[settings.onscreenControls integerValue];
@@ -358,7 +362,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
             if (touch.type == UITouchTypePencil) {
                 [self sendStylusEvent:touch];
                 return;
-            } else if (settings.absoluteTouchMode) { // temp
+            } else if (nativeTouchMode) { // temp
                 [self sendTouchEvent:touch];
                 return;
             }
@@ -536,7 +540,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
             if (touch.type == UITouchTypePencil) {
                 [self sendStylusEvent:touch];
                 return;
-            } else if (settings.absoluteTouchMode) { // temp
+            } else if (nativeTouchMode) { // temp
                 [self sendTouchEvent:touch];
                 return;
             }
@@ -626,7 +630,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
             if (touch.type == UITouchTypePencil) {
                 [self sendStylusEvent:touch];
                 return;
-            } else if (settings.absoluteTouchMode) { // temp
+            } else if (nativeTouchMode) { // temp
                 [self sendTouchEvent:touch];
                 return;
             }
@@ -650,7 +654,7 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
         for (UITouch* touch in touches) {
             if (touch.type == UITouchTypePencil) {
                 [self sendStylusEvent:touch];
-            } else if (settings.absoluteTouchMode) { // temp
+            } else if (nativeTouchMode) { // temp
                 [self sendTouchEvent:touch];
             }
         }
